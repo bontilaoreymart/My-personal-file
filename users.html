@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		a {
+			text-align: right;
+		}
+		div {
+		  background-color: lightgrey;
+		  width: 500px;
+		  border: 5px solid green;
+		  padding: 10px;
+		  margin: 5px;
+		}
+		table#user-lists {
+		    width: 100%;
+		    max-width: 267px;
+		    margin: 0 auto;
+		}
+		div#userForm {
+		    width: 500px;
+		    margin: 5rem auto;
+		    display: flex;
+		    flex-direction: column;
+		    box-shadow: 1px 1px 12px 0px #000;
+		    padding: 1rem;
+		    border-radius: 5px;
+		}
+		div#userForm h1 { margin-top: 0; }
+		button#submitButton {
+		    margin-top: 10px;
+		}
+	</style>
+</head>
+<body onload="loadLists()">
+	<div class="links">
+		<a href="javascript:void(0)" id="logoutBtn">Logout</a><br>
+		
+		<a href="javascript:void(0)" id="adduserBtn">Add User</a>	
+	</div>
+	<!-- Form -->
+	<div id="userForm" style="display: none;">
+		<h2>Add User</h2>
+		<form method="post" id="add-user">
+			<label for="username">Username:</label> <input type="text" id="username" name="username" /><br>
+			<label for="password">Password:</label> <input type="text" id="password" name="password"><br>
+			<button id="submitButton">Save</button>
+		</form>
+	</div>
+
+	<!-- Lists of users -->
+	<div id="users">
+		<table id="user-lists">
+			<!-- Dynamic display -->
+		</table>
+	</div>
+
+	<script>
+		var token = localStorage.getItem("token");
+		if(token == '') {
+			console.log(token);
+			location.href="login.html";
+		}
+
+		var logoutBtn = document.getElementById('logoutBtn');
+		logoutBtn.onclick = function(e) {
+			localStorage.setItem('token', '');
+			location.href="login.html";
+		}
+
+		var logoutBtn = document.getElementById('logoutBtn');
+		adduserBtn.onclick = function(e) {
+			document.getElementById('userForm').style.display = 'block';
+		}
+
+		const submitForm = document.getElementById('add-user');
+		submitForm.onsubmit = function(e) {
+			e.preventDefault();
+			const username = document.getElementById('username').value;
+			const password = document.getElementById('password').value;
+			if (username == '' || password == '') {
+				alert('Username and password is required');
+				return;
+			}
+
+			// Get users record
+			var users = localStorage.getItem("users");
+			var parseUsers = JSON.parse(users);
+
+			const isFound = parseUsers.some(element => {
+			  	if (element.username == username) {
+			    	return true;
+			  	}
+
+			  	return false;
+			});
+
+			if(isFound) {
+				alert('User already exist. Please user different username.');
+			} else {
+				parseUsers.push({'username':username, 'password':password});
+				localStorage.setItem('users', JSON.stringify(parseUsers));
+				alert('New user added!');
+				document.getElementById('userForm').style.display = 'none';
+				loadLists();
+			}
+		}
+
+		function loadLists() {
+			// Clear table
+			document.getElementById("user-lists").innerHTML='';
+
+			// Append records
+			loadUsers();
+			showLabels();
+		}
+
+		function loadUsers() {
+
+			// Display all users
+			var lists = document.getElementById("user-lists");
+			var users = localStorage.getItem("users");
+			var parseUsers = JSON.parse(users);
+
+			if(parseUsers.length > 0) {
+				for(var i=0; i< parseUsers.length; i++){
+					var item = lists.insertRow(i);
+					if(parseUsers[i].username !== "admin"){
+						item.insertCell(0).innerHTML = parseUsers[i].username;
+						item.insertCell(1).innerHTML = parseUsers[i].password;	
+					}
+					
+				}
+			}
+		}	
+
+		function showLabels(){
+			var headers = ['Username','Password'];
+			var lists = document.getElementById("user-lists");
+			var item = lists.insertRow(0);
+
+			item.insertCell(0).innerHTML="<b>"+ headers[0] +"</b>";
+			item.insertCell(1).innerHTML="<b>"+ headers[1] +"</b>";
+		}
+	</script>
+</body>
+</html>

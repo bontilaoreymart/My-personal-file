@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		body {
+			text-align: center;
+		}
+		div {
+		  background-color: #00BFFF;
+		}
+		div#loginForm {
+		    width: 500px;
+		    margin: 5rem auto;
+		    display: flex;
+		    flex-direction: column;
+		    box-shadow: 1px 1px 12px 0px #000;
+		    padding: 1rem;
+		    border-radius: 5px;
+		}
+		div#loginForm h1 { margin-top: 0; }
+		button#submitButton {
+		    margin-top: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div id="loginForm">
+		<h1>Login</h1>
+		<form method="post" id="login">
+			<label for="username">Username:</label> <input type="text" id="username" name="username" /><br><br>
+			<label for="password">Password:</label> <input type="password" id="password" name="password"><br><br>
+			<button id="submitButton">Login</button>
+		</form>
+	</div>
+	<script>
+		var defaultuser = [
+			{
+				'username':'admin',
+				'password':'test',
+			}
+		];
+		// Get users record
+		var users = localStorage.getItem("users");
+		var parseUsers = JSON.parse(users);
+		if(parseUsers.length > 0) {
+			// Condition here if not empty
+		} else {
+			<?php ?>
+			// Save default user to array local storage
+			localStorage.setItem('users', JSON.stringify(defaultuser));
+		}
+
+		var token = localStorage.getItem("token");
+		if(token != '') {
+			location.href="users.html";
+		}
+		const submitLogin = document.getElementById('login');
+		submitLogin.onsubmit = function(e) {
+			e.preventDefault();
+			const username = document.getElementById('username').value;
+			const password = document.getElementById('password').value;
+			if (username == '' || password == '') {
+				alert('Username and password is required');
+				return;
+			}
+
+			const isFound = parseUsers.some(element => {
+			  	if (element.username == username && element.password == password) {
+			    	return true;
+			  	}
+
+			  	return false;
+			});
+
+			if(isFound) {
+				localStorage.setItem('token', true);
+				location.href="users.html";
+			} else {
+				alert('Invalid credentials. Please try again.');
+			}
+		}
+	</script>
+</body>
+</html>
